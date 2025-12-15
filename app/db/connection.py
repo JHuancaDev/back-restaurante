@@ -6,6 +6,7 @@ from app.models.product import Product
 from app.models.review import Review
 from app.models.table import Table
 from app.models.user import User
+from app.models.extra import Extra
 
 from .database import Base, engine
 

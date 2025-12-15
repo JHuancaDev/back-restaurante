@@ -163,14 +163,7 @@ def init_database():
                         price=prod_data["price"],
                         category_id=category.id,
                         image_url=prod_data["image_url"],
-                        is_spicy=prod_data["is_spicy"],
-                        is_vegan=prod_data["is_vegan"],
-                        is_gluten_free=prod_data["is_gluten_free"],
-                        preparation_time=prod_data["preparation_time"],
-                        calories=prod_data["calories"],
-                        tags=prod_data["tags"],
                         stock=50,  # Stock inicial
-                        popularity_score=0.7  # Score inicial de popularidad
                     )
                     db.add(product)
                     print(f"✅ Producto creado: {prod_data['name']} - S/ {prod_data['price']}")

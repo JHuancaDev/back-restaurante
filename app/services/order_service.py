@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-
+from app.models.extra import OrderExtra
 from app.models.order import Order, OrderItem
 from app.models.product import Product
 from app.models.table import Table
@@ -9,6 +9,7 @@ from app.schemas.order import OrderCreate, OrderUpdate
 def get_orders(db: Session, skip: int = 0, limit: int = 100, user_id: int = None):
     query = db.query(Order).options(
         joinedload(Order.items).joinedload(OrderItem.product),
+        joinedload(Order.extras).joinedload(OrderExtra.extra), 
         joinedload(Order.table),
         joinedload(Order.user)
     )
@@ -33,10 +34,15 @@ def get_orders(db: Session, skip: int = 0, limit: int = 100, user_id: int = None
             if item.product:
                 item.product_name = item.product.name
                 item.product_image = item.product.image_url
+                item.product_description = item.product.description
             else:
                 # Valores por defecto si no hay producto
                 item.product_name = "Producto no disponible"
                 item.product_image = ""
+                item.product_description = ""
+        
+        for extra in order.extras:
+            pass
     
     return orders
 
@@ -44,6 +50,7 @@ def get_orders(db: Session, skip: int = 0, limit: int = 100, user_id: int = None
 def get_order_by_id(db: Session, order_id: int):
     order = db.query(Order).options(
         joinedload(Order.items).joinedload(OrderItem.product),
+        joinedload(Order.extras).joinedload(OrderExtra.extra),
         joinedload(Order.table),
         joinedload(Order.user)
     ).filter(Order.id == order_id).first()
@@ -70,13 +77,15 @@ def get_order_by_id(db: Session, order_id: int):
                 # Asignar los campos directamente al objeto OrderItem
                 item.product_name = item.product.name
                 item.product_image = item.product.image_url
+                item.product_description = item.product.description
                 print(f"DEBUG:   Producto: {item.product_name}, Imagen: {item.product_image}")
             else:
                 # Valores por defecto si no hay producto
                 item.product_name = "Producto no disponible"
                 item.product_image = ""
+                item.product_description = ""
                 print(f"DEBUG:   Producto no encontrado en BD")
-    
+        
     return order
 
 def create_order(db: Session, order: OrderCreate, user_id: int):

@@ -14,6 +14,7 @@ from app.controllers.orders import router as orders_router
 from app.controllers.cart import router as cart_router
 from app.controllers.client_websocket import router as client_ws_router
 from app.controllers.websocket import router as websocket_router
+from app.controllers.extras import router as extras_router
 
 from app.db.connection import create_tables
 
@@ -29,10 +30,12 @@ app = FastAPI(
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:4200"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],  # Añade esto
+    max_age=600,
 )
 
 # Incluir routers
@@ -47,6 +50,7 @@ app.include_router(orders_router)
 app.include_router(cart_router) 
 app.include_router(client_ws_router)
 app.include_router(websocket_router)
+app.include_router(extras_router)
 
 @app.get("/")
 def read_root():

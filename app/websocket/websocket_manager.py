@@ -60,3 +60,23 @@ async def notify_new_order(order_data: dict):
         logger.info(f"📨 Notificación de nueva orden enviada: Orden #{order_data.get('id')}")
     except Exception as e:
         logger.error(f"Error enviando notificación: {e}")
+
+
+# Agregado
+
+# app/websocket/websocket_manager.py - AGREGAR ESTA FUNCIÓN
+async def notify_order_updated(order_data: dict):
+    """
+    Notificar cuando una orden es actualizada (agregar extras, etc.)
+    """
+    try:
+        message = {
+            "type": "order_updated",  # 🔥 Nuevo tipo de notificación
+            "data": order_data,
+            "timestamp": asyncio.get_event_loop().time(),
+            "updated_type": "extras_added"  # 🔥 Indicar que es por extras
+        }
+        await manager.broadcast(json.dumps(message, default=str))
+        logger.info(f"📢 Notificación de orden actualizada enviada: Orden #{order_data.get('id')}")
+    except Exception as e:
+        logger.error(f"Error enviando notificación de actualización: {e}")

@@ -19,7 +19,7 @@ def get_user_by_id(db: Session, user_id: int):
 def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)
     db_user = User(
-        email=user.email,
+        email=user.email.lower(),
         password=hashed_password,
         full_name=user.full_name,
         role=user.role
@@ -35,7 +35,7 @@ def create_google_user(db: Session, user_data: dict):
     Crear usuario desde Google Sign-In
     """
     db_user = User(
-        email=user_data["email"],
+        email=user_data["email"].lower(),
         password=None,  # No password para usuarios de Google
         full_name=user_data.get("display_name", user_data["email"].split('@')[0]),
         firebase_uid=user_data["uid"],

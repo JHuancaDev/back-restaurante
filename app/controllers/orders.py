@@ -130,7 +130,31 @@ def read_my_orders(
     Obtener los pedidos del usuario actual.
     """
     orders = get_orders(db, skip=skip, limit=limit, user_id=current_user.id)
-    return orders
+    
+    # 🔥 CORREGIR: Convertir extras para incluir extra_name
+    result = []
+    for order in orders:
+        order_dict = order.__dict__.copy()
+        
+        # Convertir extras manualmente
+        order_extras = []
+        for extra in order.extras:
+            extra_dict = {
+                "id": extra.id,
+                "order_id": extra.order_id,
+                "extra_id": extra.extra_id,
+                "quantity": extra.quantity,
+                "unit_price": extra.unit_price,
+                "subtotal": extra.subtotal,
+                "extra_name": extra.extra.name if extra.extra else "Extra",  # 🔥 ESTO FALTA
+                "created_at": extra.created_at
+            }
+            order_extras.append(extra_dict)
+        
+        order_dict["extras"] = order_extras
+        result.append(order_dict)
+    
+    return result
 
 @router.get("/{order_id}", response_model=OrderResponse)
 def read_order(
@@ -191,11 +215,12 @@ def update_existing_order(
 # En app/controllers/orders.py - CORREGIR el método
 # En app/controllers/orders.py - CORREGIR completamente el método
 # En app/controllers/orders.py - CORREGIR completamente el método
+# app/controllers/orders.py - SI YA TIENES BackgroundTasks PARA update_order_status
 @router.patch("/{order_id}/status", response_model=OrderResponse)
 def update_order_status_route(
     order_id: int,
     status: str,
-    background_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks,  # 🔥 YA DEBERÍA ESTAR
     db: Session = Depends(get_db),
     current_user = Depends(get_current_admin)
 ):
@@ -210,15 +235,13 @@ def update_order_status_route(
                 detail="Pedido no encontrado"
             )
         
-        # 🔥 CORREGIR: Función de notificación simplificada
+        # 🔥 CORRECCIÓN: Función para notificación simplificada
         def send_notification():
             try:
                 # Crear una nueva sesión de base de datos
                 import asyncio
-
-                from app.services.notification_service import \
-                    notification_service
-
+                from app.services.notification_service import notification_service
+                
                 # Crear un nuevo event loop para la tarea en segundo plano
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)

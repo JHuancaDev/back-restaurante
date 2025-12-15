@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-
+from app.schemas.extra import OrderExtraResponse
 from pydantic import BaseModel, ConfigDict
 
 
@@ -20,6 +20,7 @@ class OrderItemResponse(OrderItemBase):
     subtotal: float
     product_name: Optional[str] = None  # Cambiar a Optional
     product_image: Optional[str] = None  # Cambiar a Optional
+    product_description: Optional[str] = None
 
 class OrderBase(BaseModel):
     order_type: str  # 'delivery' o 'dine_in'
@@ -49,7 +50,7 @@ class OrderResponse(OrderBase):
     created_at: datetime
     updated_at: Optional[datetime]
     items: List[OrderItemResponse]
+    extras: List[OrderExtraResponse] = []  # ← Agregar esta línea
     table_number: Optional[int] = None
-    table_number: Optional[int] = None  # Número de mesa
-    table_capacity: Optional[int] = None  # Capacidad de la mesa
+    table_capacity: Optional[int] = None
     user_name: str
